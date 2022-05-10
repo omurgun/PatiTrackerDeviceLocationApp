@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
             Date()
         )
@@ -42,9 +43,19 @@ class MainActivity : AppCompatActivity() {
         )))*/
 
         binding.startButton.setOnClickListener {
-            val serviceIntent = Intent(this, ForegroundLocationService::class.java)
-            bindService(serviceIntent, mainViewModel, BIND_AUTO_CREATE)
+            locationPermissionState.requestPermissions()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val serviceIntent = Intent(this, ForegroundLocationService::class.java)
+        bindService(serviceIntent, mainViewModel, BIND_AUTO_CREATE)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(mainViewModel)
     }
 
     private fun sendData(requestData: RequestData){

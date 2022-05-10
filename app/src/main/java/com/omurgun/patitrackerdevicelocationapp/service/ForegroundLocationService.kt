@@ -8,21 +8,32 @@ import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.icu.text.SimpleDateFormat
 import android.location.Location
 import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.omurgun.patitrackerdevicelocationapp.R
 import com.omurgun.patitrackerdevicelocationapp.data.local.dataStore.LocationPreferences
+import com.omurgun.patitrackerdevicelocationapp.data.models.request.RequestData
+import com.omurgun.patitrackerdevicelocationapp.data.models.request.RequestDeviceData
+import com.omurgun.patitrackerdevicelocationapp.data.models.response.ResponseData
 import com.omurgun.patitrackerdevicelocationapp.data.repo.LocationRepository
+import com.omurgun.patitrackerdevicelocationapp.domain.useCases.DataUseCase
+import com.omurgun.patitrackerdevicelocationapp.util.ResultData
 import com.omurgun.patitrackerdevicelocationapp.util.hasPermission
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class ForegroundLocationService : LifecycleService() {
@@ -33,12 +44,45 @@ class ForegroundLocationService : LifecycleService() {
     @Inject
     lateinit var locationPreferences: LocationPreferences
 
+    @Inject
+    lateinit var dataUseCase: DataUseCase
+
     private val localBinder = LocalBinder()
     private var bindCount = 0
 
     private var started = false
     private var isForeground = false
+    private var locations : ArrayList<RequestDeviceData> = arrayListOf()
 
+    private fun sendDataFromAPI(requestData: RequestData) : LiveData<ResultData<ResponseData>> {
+        return dataUseCase.sendDataUseCase(requestData).asLiveData(Dispatchers.IO)
+    }
+
+    private fun sendData(requestData: RequestData){
+        val data = sendDataFromAPI(requestData)
+
+        data.observe(this) {
+            when (it) {
+                is ResultData.Loading -> {
+                    println("loading")
+
+                }
+                is ResultData.Success -> {
+
+                    println("Success")
+                    println("data : ${it.data}")
+
+
+                }
+                is ResultData.Exception -> {
+                    println("Exception")
+
+
+                }
+            }
+        }
+
+    }
     private fun isBound() = bindCount > 0
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -177,6 +221,18 @@ class ForegroundLocationService : LifecycleService() {
         )
         val contentText = if (location != null) {
             println("notfication location : ${location.latitude}")
+            val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
+                Date())
+            locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
+
+
+            if (locations.size == 5)
+            {
+                val newLocations = locations.map { it.copy() }
+                sendData(RequestData("11111111", newLocations))
+                locations.clear()
+            }
+
             getString(R.string.location_lat_lng, location.latitude, location.longitude)
         } else {
             getString(R.string.waiting_for_location)

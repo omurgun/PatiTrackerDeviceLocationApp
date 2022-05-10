@@ -159,10 +159,13 @@ class ForegroundLocationService : LifecycleService() {
     private fun manageLifetime() {
         when {
             // We should not be in the foreground while UI clients are bound.
-            isBound() -> exitForeground()
+            isBound() -> println("exitForeground") //exitForeground()
 
             // Location updates were started.
-            locationRepository.isReceivingLocationUpdates.value -> enterForeground()
+            locationRepository.isReceivingLocationUpdates.value -> {
+                println("enterForeground")
+                enterForeground()
+            }
 
             // Nothing to do, so we can stop.
             else -> stopSelf()

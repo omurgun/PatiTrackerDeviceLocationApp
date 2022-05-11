@@ -201,7 +201,7 @@ class ForegroundLocationService : LifecycleService() {
         val notificationChannel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
             getString(R.string.notification_channel_name),
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_LOW
         )
         val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(notificationChannel)
@@ -232,7 +232,7 @@ class ForegroundLocationService : LifecycleService() {
             if (locations.size == 5)
             {
                 val newLocations = locations.map { it.copy() }
-                sendData(RequestData("11111111", newLocations))
+                sendData(RequestData(resources.getString(R.string.device_id), newLocations))
                 locations.clear()
             }
 

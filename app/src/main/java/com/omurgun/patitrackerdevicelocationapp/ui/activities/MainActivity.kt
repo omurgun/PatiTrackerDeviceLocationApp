@@ -44,6 +44,17 @@ class MainActivity : AppCompatActivity() {
 
         binding.startButton.setOnClickListener {
             locationPermissionState.requestPermissions()
+
+            binding.startButton.isEnabled = false
+            binding.stopButton.isEnabled = true
+        }
+
+        binding.stopButton.setOnClickListener {
+            locationPermissionState.requestPermissions()
+
+
+            binding.startButton.isEnabled = true
+            binding.stopButton.isEnabled = false
         }
     }
 

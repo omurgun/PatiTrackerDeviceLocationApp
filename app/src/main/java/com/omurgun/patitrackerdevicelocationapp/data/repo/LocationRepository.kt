@@ -27,8 +27,8 @@ class LocationRepository @Inject constructor(
     @SuppressLint("MissingPermission") // Only called when holding location permission.
     fun startLocationUpdates() {
         val request = LocationRequest.create().apply {
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            interval = 0// 10 seconds
+            priority = LocationRequest.PRIORITY_LOW_POWER
+            interval = 1000// 10 seconds
 
         }
         // Note: For this sample it's fine to use the main looper, so our callback will run on the
@@ -54,7 +54,7 @@ class LocationRepository @Inject constructor(
         override fun onLocationResult(result: LocationResult) {
             _lastLocation.value = result.lastLocation
 
-            println("location : ${result.lastLocation.latitude},${result.lastLocation.longitude}")
+            //println("location : ${result.lastLocation.latitude},${result.lastLocation.longitude}")
         }
     }
 }

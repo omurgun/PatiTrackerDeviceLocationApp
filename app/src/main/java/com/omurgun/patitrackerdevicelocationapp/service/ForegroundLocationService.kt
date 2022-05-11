@@ -49,6 +49,7 @@ class ForegroundLocationService : LifecycleService() {
 
     private val localBinder = LocalBinder()
     private var bindCount = 0
+    private var timerCount = -1
 
     private var started = false
     private var isForeground = false
@@ -58,19 +59,20 @@ class ForegroundLocationService : LifecycleService() {
         return dataUseCase.sendDataUseCase(requestData).asLiveData(Dispatchers.IO)
     }
 
+
     private fun sendData(requestData: RequestData){
         val data = sendDataFromAPI(requestData)
 
         data.observe(this) {
             when (it) {
                 is ResultData.Loading -> {
-                    println("loading")
+
 
                 }
                 is ResultData.Success -> {
 
                     println("Success")
-                    println("data : ${it.data}")
+
 
 
                 }
@@ -223,18 +225,36 @@ class ForegroundLocationService : LifecycleService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val contentText = if (location != null) {
-            println("notfication location : ${location.latitude}")
-            val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
-                Date())
-            locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
+            println("timerCount : $timerCount")
+            timerCount++
+            if (timerCount == 0) {
+                val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
+                    Date())
+                locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
+                println("added location : ${location.latitude},${location.longitude}")
 
-
-            if (locations.size == 5)
-            {
-                val newLocations = locations.map { it.copy() }
-                sendData(RequestData(resources.getString(R.string.device_id), newLocations))
-                locations.clear()
             }
+            else if(timerCount == 2) {
+                timerCount = -1
+                val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
+                    Date())
+                locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
+
+                println("added location : ${location.latitude},${location.longitude}")
+                if (locations.size == 2)
+                {
+                    val newLocations = locations.map { it.copy() }
+                    sendData(RequestData(resources.getString(R.string.device_id), newLocations))
+                    locations.clear()
+                }
+            }
+
+
+
+
+
+
+
 
             getString(R.string.location_lat_lng, location.latitude, location.longitude)
         } else {
@@ -249,8 +269,8 @@ class ForegroundLocationService : LifecycleService() {
             .addAction(R.drawable.ic_stop, getString(R.string.stop), stopIntent)
             .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .build()
     }
 
@@ -275,6 +295,7 @@ class ForegroundLocationService : LifecycleService() {
         const val NOTIFICATION_CHANNEL_ID = "LocationUpdates"
         const val ACTION_STOP_UPDATES = "com.omurgun.patitrackerdevicelocationapp" + ".ACTION_STOP_UPDATES"
     }
+
 }
 
 /**

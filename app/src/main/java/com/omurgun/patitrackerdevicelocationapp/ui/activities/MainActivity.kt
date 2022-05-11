@@ -11,6 +11,9 @@ import com.omurgun.patitrackerdevicelocationapp.databinding.ActivityMainBinding
 import com.omurgun.patitrackerdevicelocationapp.service.ForegroundLocationService
 import com.omurgun.patitrackerdevicelocationapp.ui.viewModels.MainViewModel
 import com.omurgun.patitrackerdevicelocationapp.util.ResultData
+import com.omurgun.patitrackerdevicelocationapp.util.timer.TimerBroadCastReceiver
+import com.omurgun.patitrackerdevicelocationapp.util.timer.TimerHelper
+import com.omurgun.patitrackerdevicelocationapp.util.timer.TimerService
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
@@ -20,6 +23,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel: MainViewModel by viewModels()
     private lateinit var locationPermissionState : LocationPermissionState
+    private lateinit var timerHelper : TimerHelper
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +62,8 @@ class MainActivity : AppCompatActivity() {
             binding.stopButton.isEnabled = false
         }
     }
+
+
 
     override fun onStart() {
         super.onStart()

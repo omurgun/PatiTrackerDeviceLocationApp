@@ -28,7 +28,8 @@ class LocationRepository @Inject constructor(
     fun startLocationUpdates() {
         val request = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_LOW_POWER
-            interval = 1000// 10 seconds
+            interval = 5000// 5 seconds
+            fastestInterval = 1000
 
         }
         // Note: For this sample it's fine to use the main looper, so our callback will run on the

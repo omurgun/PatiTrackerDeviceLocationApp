@@ -161,8 +161,10 @@ class ForegroundLocationService : LifecycleService() {
     private fun manageLifetime() {
         when {
             // We should not be in the foreground while UI clients are bound.
-            isBound() -> println("exitForeground") //exitForeground()
-
+            isBound() -> {
+                println("exitForeground")
+                //exitForeground()
+            }
             // Location updates were started.
             locationRepository.isReceivingLocationUpdates.value -> {
                 println("enterForeground")
@@ -225,13 +227,13 @@ class ForegroundLocationService : LifecycleService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val contentText = if (location != null) {
-            println("timerCount : $timerCount")
             timerCount++
+            println("timerCount : $timerCount")
             if (timerCount == 0) {
                 val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
                     Date())
                 locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
-                println("added location : ${location.latitude},${location.longitude}")
+                println("added location : ${location.latitude},${location.longitude} locations.size : ${locations.size}")
 
             }
             else if(timerCount == 2) {
@@ -240,8 +242,8 @@ class ForegroundLocationService : LifecycleService() {
                     Date())
                 locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
 
-                println("added location : ${location.latitude},${location.longitude}")
-                if (locations.size == 2)
+                println("added location : ${location.latitude},${location.longitude} locations.size : ${locations.size}")
+                if (locations.size >= 2)
                 {
                     val newLocations = locations.map { it.copy() }
                     sendData(RequestData(resources.getString(R.string.device_id), newLocations))
@@ -290,7 +292,7 @@ class ForegroundLocationService : LifecycleService() {
     }
 
     private companion object {
-        const val UNBIND_DELAY_MILLIS = 2000.toLong() // 2 seconds
+        const val UNBIND_DELAY_MILLIS = 1000.toLong() // 2 seconds
         const val NOTIFICATION_ID = 1
         const val NOTIFICATION_CHANNEL_ID = "LocationUpdates"
         const val ACTION_STOP_UPDATES = "com.omurgun.patitrackerdevicelocationapp" + ".ACTION_STOP_UPDATES"

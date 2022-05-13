@@ -227,29 +227,41 @@ class ForegroundLocationService : LifecycleService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val contentText = if (location != null) {
-            timerCount++
-            println("timerCount : $timerCount")
-            if (timerCount == 0) {
-                val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
-                    Date())
-                locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
-                println("added location : ${location.latitude},${location.longitude} locations.size : ${locations.size}")
+            val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
+                Date())
+            locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
 
+            println("added location : ${location.latitude},${location.longitude} locations.size : ${locations.size}")
+            if (locations.size >= 3)
+            {
+                val newLocations = locations.map { it.copy() }
+                sendData(RequestData(resources.getString(R.string.device_id), newLocations))
+                locations.clear()
             }
-            else if(timerCount == 2) {
-                timerCount = -1
-                val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
-                    Date())
-                locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
 
-                println("added location : ${location.latitude},${location.longitude} locations.size : ${locations.size}")
-                if (locations.size >= 2)
-                {
-                    val newLocations = locations.map { it.copy() }
-                    sendData(RequestData(resources.getString(R.string.device_id), newLocations))
-                    locations.clear()
-                }
-            }
+//            timerCount++
+//            println("timerCount : $timerCount")
+//            if (timerCount == 0) {
+//                val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
+//                    Date())
+//                locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
+//                println("added location : ${location.latitude},${location.longitude} locations.size : ${locations.size}")
+//
+//            }
+//            else if(timerCount == 5) {
+//                timerCount = -1
+//                val currentDate: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.s", Locale.getDefault()).format(
+//                    Date())
+//                locations.add(RequestDeviceData(location.latitude,location.longitude,100.0,currentDate))
+//
+//                println("added location : ${location.latitude},${location.longitude} locations.size : ${locations.size}")
+//                if (locations.size >= 15)
+//                {
+//                    val newLocations = locations.map { it.copy() }
+//                    sendData(RequestData(resources.getString(R.string.device_id), newLocations))
+//                    locations.clear()
+//                }
+//            }
 
 
 

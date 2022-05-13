@@ -27,7 +27,7 @@ class LocationRepository @Inject constructor(
     @SuppressLint("MissingPermission") // Only called when holding location permission.
     fun startLocationUpdates() {
         val request = LocationRequest.create().apply {
-            priority = LocationRequest.PRIORITY_LOW_POWER
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
             interval = 5000// 5 seconds
             fastestInterval = 1000
 

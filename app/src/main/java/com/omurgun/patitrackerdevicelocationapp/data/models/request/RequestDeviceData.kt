@@ -5,5 +5,6 @@ data class RequestDeviceData(
     val lat : Double,
     val lng : Double,
     val battery : Double,
-    val timestamp : String
+    val timestamp : String,
+    val speed : Int = 0
 )

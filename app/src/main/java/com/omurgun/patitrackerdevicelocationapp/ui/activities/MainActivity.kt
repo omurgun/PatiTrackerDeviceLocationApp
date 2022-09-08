@@ -5,6 +5,7 @@ import android.icu.text.SimpleDateFormat
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.omurgun.patitrackerdevicelocationapp.data.models.request.RequestData
 import com.omurgun.patitrackerdevicelocationapp.data.models.request.RequestDeviceData
 import com.omurgun.patitrackerdevicelocationapp.databinding.ActivityMainBinding
@@ -15,6 +16,7 @@ import com.omurgun.patitrackerdevicelocationapp.util.timer.TimerBroadCastReceive
 import com.omurgun.patitrackerdevicelocationapp.util.timer.TimerHelper
 import com.omurgun.patitrackerdevicelocationapp.util.timer.TimerService
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.util.*
 
 @AndroidEntryPoint
@@ -30,6 +32,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+
+        lifecycleScope.launch {
+            binding.deviceIdTextInput.setText(mainViewModel.getDeviceId())
+        }
 
 
         locationPermissionState = LocationPermissionState(this) {
@@ -60,6 +68,10 @@ class MainActivity : AppCompatActivity() {
 
             binding.startButton.isEnabled = true
             binding.stopButton.isEnabled = false
+        }
+
+        binding.saveDeviceIdButton.setOnClickListener {
+            mainViewModel.saveDeviceId(binding.deviceIdTextInput.text.toString())
         }
     }
 

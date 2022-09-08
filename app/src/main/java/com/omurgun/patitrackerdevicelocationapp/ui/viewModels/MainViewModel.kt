@@ -14,6 +14,7 @@ import com.omurgun.patitrackerdevicelocationapp.service.ForegroundLocationServic
 import com.omurgun.patitrackerdevicelocationapp.util.ResultData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,6 +40,18 @@ class MainViewModel @Inject constructor(
         } else {
             startLocationUpdates()
         }
+    }
+
+    fun saveDeviceId(deviceId: String) {
+        viewModelScope.launch {
+            locationPreferences.setDeviceId(deviceId)
+        }
+
+    }
+
+    suspend fun getDeviceId() : String {
+        return locationPreferences.getDeviceId.first()
+
     }
 
     private fun startLocationUpdates() {

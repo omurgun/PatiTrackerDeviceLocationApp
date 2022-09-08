@@ -234,9 +234,14 @@ class ForegroundLocationService : LifecycleService() {
             println("added location : ${location.latitude},${location.longitude} locations.size : ${locations.size}")
             if (locations.size >= 3)
             {
-                val newLocations = locations.map { it.copy() }
-                sendData(RequestData(resources.getString(R.string.device_id), newLocations))
-                locations.clear()
+
+                lifecycleScope.launch {
+                    val newLocations = locations.map { it.copy() }
+                    val requestData = RequestData(locationPreferences.getDeviceId.first(),newLocations)
+                    sendData(requestData)
+                    locations.clear()
+                }
+
             }
 
 //            timerCount++
